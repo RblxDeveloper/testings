@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roblox Winner Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        div {
+            margin-bottom: 10px;
+        }
+
+        #winnerSection {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <label for="userIdInput">Enter Roblox User ID:</label>
+        <input type="text" id="userIdInput">
+        <button onclick="generateWinner()">Generate Winner</button>
+    </div>
+    <div id="winnerSection"></div>
+
+    <script>
+        async function generateWinner() {
+            const userId = document.getElementById("userIdInput").value;
+
+            if (!userId) {
+                alert("Please enter a valid Roblox User ID");
+                return;
+            }
+
+            try {
+                const followers = await fetchFollowers(userId);
+
+                if (followers.length === 0) {
+                    alert("This has no user followers to choose from");
+                    return;
+                }
+
+                const winnerIndex = Math.floor(Math.random() * followers.length);
+                const winner = followers[winnerIndex];
+
+                displayWinner(winner);
+            } catch (error) {
+                console.error(error);
+                alert("Error fetching data. Please try again.");
+            }
+        }
+
+        async function fetchFollowers(userId) {
+            try {
+                const response = await fetch(`https://api.roblox.com/users/${userId}/followers`);
+
+                if (!response.ok) {
+                    throw new Error("Error fetching data");
+                }
+
+                return response.json();
+            } catch (error) {
+                console.error(error);
+                throw new Error("Error fetching data");
+            }
+        }
+
+        function displayWinner(winner) {
+            const winnerSection = document.getElementById("winnerSection");
+            winnerSection.innerHTML = `<p>Winner: ${winner.Username} (ID: ${winner.Id})</p>`;
+        }
+    </script>
+</body>
+
+</html>
